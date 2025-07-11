@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Путь Итами</title>
+  <title>Сон или Реальность?</title>
   <style>
     body {
       margin: 0;
@@ -25,7 +25,7 @@
       display: block;
     }
     .container {
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.65);
       border-radius: 12px;
       padding: 2em;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -48,81 +48,52 @@
     button:hover {
       background: #666;
     }
-    .quiz {
-      margin-top: 1em;
-    }
-    .quiz p {
-      margin-bottom: 0.5em;
-    }
-    .quiz button {
-      width: auto;
-      margin-right: 0.5em;
-    }
   </style>
 </head>
 <body>
   <div id="game-container"></div>
   <script>
-    const scenes = [
+    // Массив шагов первой сцены (логика строго по твоему сценарию)
+    const scene1 = [
       {
-        id: 1,
-        title: "Водопад Очищения",
-        background: "backgrounds/waterfall.jpg",
-        messages: [
-          "Итами просыпайся! Итамиии... ты в порядке?",
-          "Хух, я волновался что уже не получилось. Добро пожаловать. Нам с тобой предстоит пройти небольшое приключение и отыскать кое-что, оставленное тебе в этом месте.",
-          "Сейчас мы находимся у водопада очищения. Это место служит защитной стеной, здесь нет обходных путей. Путь только один — сквозь водопад. Он не пропускает всё, что не должно пройти.",
-          "Сложно поверить, но раньше его тут не было. Это была просто тропа. Нужно поторопиться, у нас не так много времени."
-        ],
-        actions: [
-          { text: "Ты слышишь чей-то голос, кто-то зовёт тебя — Проснуться.", nextScene: 1 },
-          { text: "Осмотреться вокруг.", nextScene: 1 },
-          { text: "... Проследовать за духом сквозь водопад.", nextScene: 2 }
-        ]
+        text: "Итами просыпайся! Итамиии... ты впорядке?",
+        action: { text: "Ты слышишь чей то голос, кто то зовет тебя - Проснуться.", next: 1 }
       },
       {
-        id: 2,
-        title: "Астрономическая Степь",
-        background: "backgrounds/starfield.jpg",
-        messages: [
-          "Место, где мысли и мечты отображаются в виде звёзд. Считается, что если коснуться звезды на воде, можно узнать, что она значит.",
-          "Видишь замок, к которому ведёт степь? Это место, куда мы с тобой направляемся. Хочешь попробовать устоять на воде и коснуться отражения звезды?"
-        ],
-        actions: [
-          { text: "Ступить на воду и попытаться коснуться звезды.", nextScene: 21 },
-          { text: "Следовать дальше по пути к Замку.", nextScene: 22 }
-        ]
+        text: "Хух, я волновался что уже не получилось, Добро пожаловать, Нам с тобой предстоит пройти небольшое приключение, и отыскать кое что оставленое тебе в этом месте.",
+        action: { text: "Осмотреться вокруг.", next: 2 }
+      },
+      {
+        text: "Сейчас мы находимся у водопада очищения, это место служит защитной стеной, здесь нет обходных путей или горных проходов, путь только один через водопад, сквозь него проходит все, и не проходит так же Хех, Если что то посчитается не нужным или не допустимым, оно будет раздавленно непрерывным потоком. Сложно поверить но раньше его тут не было, и это была просто тропа. Ой! нужно поторопиться у нас не так много времени.",
+        action: { text: "... Проследовать за духом сквозь водопад.", next: "scene2" }
       }
     ];
 
-    let currentSceneIndex = 0;
+    let step = 0;
 
-    function showScene(index) {
-      const scene = scenes.find(s => s.id === index);
-      if (!scene) return;
+    function renderScene1() {
       const container = document.getElementById('game-container');
-      document.body.style.backgroundImage = scene.background ? `url('${scene.background}')` : 'none';
-
+      document.body.style.backgroundImage = `url('backgrounds/waterfall.jpg')`;
       let html = `<div class="screen active"><div class="container">`;
-      if (scene.title) {
-        html += `<h1>${scene.title}</h1>`;
-      }
-      scene.messages.forEach(msg => {
-        html += `<p>${msg}</p>`;
-      });
-
-      if (scene.actions) {
-        scene.actions.forEach(action => {
-          html += `<button onclick="showScene(${action.nextScene})">${action.text}</button>`;
-        });
-      }
-
+      html += `<h1>Сон или Реальность?</h1>`;
+      html += `<p>${scene1[step].text}</p>`;
+      html += `<button onclick="nextScene1()">${scene1[step].action.text}</button>`;
       html += `</div></div>`;
       container.innerHTML = html;
     }
 
+    function nextScene1() {
+      if (step < scene1.length - 1) {
+        step++;
+        renderScene1();
+      } else {
+        // Здесь будет запуск второй сцены, когда ты её напишешь
+        alert("Далее — вторая сцена! (Пока что она не реализована.)");
+      }
+    }
+
     window.onload = () => {
-      showScene(1);
+      renderScene1();
     };
   </script>
 </body>
