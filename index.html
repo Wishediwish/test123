@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -65,7 +64,6 @@
   <div id="game-container"></div>
   <script src="scenes.js"></script>
   <script>
-    const scenes = window.scenes;
     let currentSceneIndex = 0;
 
     function showScene(index) {
@@ -77,11 +75,15 @@
       if (scene.title) {
         html += `<h1>${scene.title}</h1>`;
       }
-      html += `<p>${scene.text}</p>`;
+      if (scene.messages) {
+        scene.messages.forEach(message => {
+          html += `<p>${message}</p>`;
+        });
+      }
 
-      if (scene.choices) {
-        scene.choices.forEach(choice => {
-          html += `<button onclick="showScene(${choice.next})">${choice.text}</button>`;
+      if (scene.actions) {
+        scene.actions.forEach(action => {
+          html += `<button onclick="showScene(${action.nextScene})">${action.text}</button>`;
         });
       }
 
@@ -100,14 +102,13 @@
     }
 
     function handleAnswer(sceneIndex, questionIndex, optionIndex) {
-      const scene = scenes[sceneIndex];
-      const question = scene.quiz[questionIndex];
+      const question = scenes[sceneIndex].quiz[questionIndex];
       const correct = question.correct;
-
       const container = document.getElementById('game-container');
       let result = '';
+
       if (Array.isArray(correct)) {
-        if (correct[optionIndex]) {
+        if (correct.includes(optionIndex)) {
           result = '<p>Верно!</p>';
         } else {
           result = '<p>Неверно, попробуй снова.</p>';
