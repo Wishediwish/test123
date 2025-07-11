@@ -48,6 +48,16 @@
     button:hover {
       background: #666;
     }
+    .quiz {
+      margin-top: 1em;
+    }
+    .quiz p {
+      margin-bottom: 0.5em;
+    }
+    .quiz button {
+      width: auto;
+      margin-right: 0.5em;
+    }
   </style>
 </head>
 <body>
@@ -65,8 +75,8 @@
           "Сложно поверить, но раньше его тут не было. Это была просто тропа. Нужно поторопиться, у нас не так много времени."
         ],
         actions: [
-          { text: "Ты слышишь чей-то голос, кто-то зовёт тебя — Проснуться.", nextStep: 1 },
-          { text: "Осмотреться вокруг.", nextStep: 2 },
+          { text: "Ты слышишь чей-то голос, кто-то зовёт тебя — Проснуться.", nextScene: 1 },
+          { text: "Осмотреться вокруг.", nextScene: 1 },
           { text: "... Проследовать за духом сквозь водопад.", nextScene: 2 }
         ]
       },
@@ -79,65 +89,41 @@
           "Видишь замок, к которому ведёт степь? Это место, куда мы с тобой направляемся. Хочешь попробовать устоять на воде и коснуться отражения звезды?"
         ],
         actions: [
-          { text: "Ступить на воду и попытаться коснуться звезды.", nextScene: 3 },
-          { text: "Следовать дальше по пути к Замку.", nextScene: 3 }
+          { text: "Ступить на воду и попытаться коснуться звезды.", nextScene: 21 },
+          { text: "Следовать дальше по пути к Замку.", nextScene: 22 }
         ]
       }
     ];
 
-    let currentScene = 0;
-    let messageIndex = 0;
+    let currentSceneIndex = 0;
 
     function showScene(index) {
-      currentScene = index;
-      messageIndex = 0;
-      renderScene();
-    }
+      const scene = scenes.find(s => s.id === index);
+      if (!scene) return;
+      const container = document.getElementById('game-container');
+      document.body.style.backgroundImage = scene.background ? `url('${scene.background}')` : 'none';
 
-    function renderScene() {
-      const container = document.getElementById("game-container");
-      const scene = scenes[currentScene];
-      document.body.style.backgroundImage = `url('${scene.background}')`;
       let html = `<div class="screen active"><div class="container">`;
-      html += `<h1>${scene.title}</h1>`;
-      for (let i = 0; i <= messageIndex; i++) {
-        if (scene.messages[i]) {
-          html += `<p>${scene.messages[i]}</p>`;
-        }
+      if (scene.title) {
+        html += `<h1>${scene.title}</h1>`;
       }
-      html += renderActions(scene);
+      scene.messages.forEach(msg => {
+        html += `<p>${msg}</p>`;
+      });
+
+      if (scene.actions) {
+        scene.actions.forEach(action => {
+          html += `<button onclick="showScene(${action.nextScene})">${action.text}</button>`;
+        });
+      }
+
       html += `</div></div>`;
       container.innerHTML = html;
     }
 
-    function renderActions(scene) {
-      let output = "";
-      if (currentScene === 0) {
-        if (messageIndex === 0) {
-          output += `<button onclick="nextStep(1)">${scene.actions[0].text}</button>`;
-        } else if (messageIndex === 2) {
-          output += `<button onclick="nextStep(2)">${scene.actions[1].text}</button>`;
-        } else if (messageIndex === 3) {
-          output += `<button onclick="goToScene(1)">${scene.actions[2].text}</button>`;
-        }
-      } else {
-        scene.actions.forEach(action => {
-          output += `<button onclick="goToScene(${action.nextScene})">${action.text}</button>`;
-        });
-      }
-      return output;
-    }
-
-    function nextStep(step) {
-      messageIndex = step + 1;
-      renderScene();
-    }
-
-    function goToScene(index) {
-      showScene(index);
-    }
-
-    window.onload = () => showScene(0);
+    window.onload = () => {
+      showScene(1);
+    };
   </script>
 </body>
 </html>
