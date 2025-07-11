@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сон или Реальность?</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      color: #fff;
+      background-color: #000;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      transition: background-image 1s ease-in-out;
+    }
+    .screen {
+      display: none;
+      padding: 2em;
+      max-width: 800px;
+      margin: auto;
+    }
+    .active {
+      display: block;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 12px;
+      padding: 2em;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    }
+    h1 {
+      text-align: center;
+      color: #ffd1dc;
+    }
+    .message {
+      margin: 1em 0;
+    }
+    button {
+      margin: 0.5em 0;
+      background: #333;
+      border: none;
+      padding: 0.75em 1.2em;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: block;
+      width: 100%;
+    }
+    button:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container"></div>
+  <script>
+    const scenes = [
+      {
+        id: 1,
+        title: "Сон или Реальность?",
+        background: "backgrounds/waterfall.jpg",
+        messages: [
+          "Дух: Итами просыпайся! Итамиии... ты впорядке?",
+          "Дух: Хух, я волновался что уже не получилось, Добро пожаловать. Нам с тобой предстоит пройти небольшое приключение, и отыскать кое-что оставленное тебе в этом месте.",
+          "Дух: Сейчас мы находимся у водопада очищения. Это место служит защитной стеной. Здесь нет обходных путей или горных проходов — путь только один через водопад. Сквозь него проходит всё, что достойно.",
+          "Сложно поверить, но раньше его тут не было. Это была просто тропа. Ой! нужно поторопиться — у нас не так много времени."
+        , 
+{
+  id: 3,
+  title: "Зал Испытаний",
+  background: "backgrounds/hall.jpg",
+  messages: [
+    "Дух: Большой зал с множеством испытаний, нельзя пройти дальше не пройдя испытание.",
+    "Дух: Похоже для тебя выпало испытание знаний. Чтобы пройти дальше нужно дать правильно ответы на 4 вопроса."
+  ],
+  quiz: [
+    {
+      q: "В каком игровом мире зародилось начало начал самого дорогого что есть у Вишеда?",
+      options: ["Black desert", "Throne and Liberty", "World of Warcraft", "Rust"],
+      correct: 1
+    },
+    {
+      q: "Число что стало причиной волнений и небольшого страха, но в результате этого создало толчек чему-то невероятному ...",
+      options: ["69", "3", "7", "13", "520", "8.5", "6.5", "496"],
+      correct: 5
+    },
+    {
+      q: "Смертельная битва... Современный 'Пропуск' не горбатый, не рогатый...",
+      options: ["Гладиатор", "Боец", "Терминатор", "Чужой"],
+      correct: 0
+    },
+    {
+      q: "Какое мифическое существо почувствует особую энергию к Вишеду?",
+      options: ["Дракон", "Русалка", "Единорог", "Грифон", "Вампир", "Минотавр"],
+      correct: 2
+    }
+  ],
+  actions: [
+    { text: "Проследовать за духом.", nextScene: 4 }
+  ]
+},
+{
+  id: 4,
+  title: "Огненный Зал",
+  background: "backgrounds/firehall.jpg",
+  messages: [
+    "Дух: Мое одно из любимых мест...",
+    "Система: Коснувшись самого пламени, ты чувствуешь что это огромное пламя — чувства Вишеда к Итами...",
+    "Дух: Мы уже совсем рядом! Осталось пройти одно место..."
+  ],
+  actions: [
+    { text: "Пройти дальше в поисках пути.", nextScene: 5 }
+  ]
+},
+{
+  id: 5,
+  title: "Тропа Сомнений",
+  background: "backgrounds/mistpath.jpg",
+  messages: [
+    "Дух: Это место никогда не меняется... Это Эмоции — страха, волнения, сомнения.",
+    "Дух: Духи эмоций явно замечают тебя и ощущают твое присутствие...",
+    "Система: Коснувшись спящего силуэта, ты чувствуешь что это страх потерять Итами. Он спит."
+  ],
+  actions: [
+    { text: "Пройти в Animae.", nextScene: 6 }
+  ]
+},
+{
+  id: 6,
+  title: "Animae",
+  background: "backgrounds/animae.jpg",
+  messages: [
+    "Дух: Здесь я должен вернуться на своё место. Спасибо тебе...",
+    "Система: Спокойное, уютное место без тревог...",
+    "Система: Ты видишь маленькую коробку без замков и ручек.",
+    "Система: Под ней есть записка.",
+    "Система: Сегодня твой День рождения... Это не просто подарок — это частица моей души. Я хочу отдать тебе всю свою жизнь..."
+  ],
+  actions: [
+    { text: "Вернуться на Тропу Сомнений.", nextScene: 7 }
+  ]
+},
+{
+  id: 7,
+  title: "Возвращение. Сон или реальность?",
+  background: "backgrounds/return.jpg",
+  messages: [
+    "Система: Вернувшись на Тропу Сомнений, ты видишь в её конце выход.",
+    "Система: Это место больше не заполнено туманом...",
+    "Система: Ты проснулась у себя дома, и коробка лежит рядом с тобой..."
+  ],
+  actions: []
+}
+],
+        actions: [
+          { text: "Ты слышишь чей-то голос, кто-то зовет тебя — Проснуться.", next: 2 }
+        ]
+      },
+      {
+        id: 2,
+        title: "Астрономическая Степь",
+        background: "backgrounds/starfield.jpg",
+        messages: [
+          "Дух: Место где мысли и мечты отображаются ввиде звезд. Считается, что если коснуться отображения звезды на воде, можно узнать, что она значит.",
+          "Но не каждый может устоять и не утонуть в звездном озере. Видишь Замок, к которому ведёт степь? Это место, куда мы с тобой направляемся.",
+          "Хочешь попробовать устоять на воде и коснуться отражения звезды? Или пойдём дальше? Думаю, у нас хватит времени посмотреть одну из них."
+        ],
+        actions: [
+          { text: "Ступить на воду и попытаться коснуться звезды.", next: 3 },
+          { text: "Следовать дальше по пути к Замку.", next: 4 }
+        ]
+      },
+      {
+        id: 3,
+        title: "Отражение Звезды",
+        background: "backgrounds/starfield.jpg",
+        messages: [
+          "Ступив аккуратно на поверхность воды, немного пошатнувшись ты понимаешь, что вода тебя держит.",
+          "Ты делаешь ещё один шаг, чтобы дотянуться до звезды. Коснувшись её, ты понимаешь, что эта звезда отображает искреннее желание Вишеда прожить всю жизнь с человеком по имени Итами.",
+          "Звезда начинает светиться ещё сильнее и перемещается дальше по звездному небу.",
+          "Дух: Удивительно... Пойдём дальше. В будущем ты сможешь вернуться и всё рассмотреть."
+        ],
+        actions: [
+          { text: "Продолжить путь к Замку.", next: 5 }
+        ]
+      },
+      {
+        id: 4,
+        title: "Пропуск звезды",
+        background: "backgrounds/starfield.jpg",
+        messages: [
+          "Дух: Удивительно, но кажется это была твоя звезда.",
+          "Итами, пойдём дальше, у нас не так много времени сейчас. Думаю, в будущем у тебя будет возможность вернуться и во всём тут разобраться."
+        ],
+        actions: [
+          { text: "Продолжить путь к Замку.", next: 5 }
+        ]
+      },
+      {
+        id: 5,
+        title: "Зал Испытаний (будет добавлен)",
+        background: "backgrounds/hall.jpg",
+        messages: [
+          "Зал испытаний будет реализован в следующем этапе."
+        ],
+        actions: [
+          { text: "Завершить демо", next: null }
+        ]
+      }
+    ];
+
+    let currentSceneIndex = 0;
+    let messageIndex = 0;
+
+    function showScene(index) {
+      currentSceneIndex = index;
+      messageIndex = 0;
+      renderScene();
+    }
+
+    function renderScene() {
+      const container = document.getElementById('game-container');
+      const scene = scenes[currentSceneIndex];
+
+      document.body.style.backgroundImage = `url('${scene.background}')`;
+
+      let html = '<div class="screen active"><div class="container">';
+      html += `<h1>${scene.title}</h1>`;
+      for (let i = 0; i <= messageIndex && i < scene.messages.length; i++) {
+        html += `<div class="message">${scene.messages[i]}</div>`;
+      }
+
+      if (messageIndex < scene.messages.length - 1) {
+        html += `<button onclick="nextMessage()">Продолжить</button>`;
+      } else if (scene.actions) {
+        scene.actions.forEach(action => {
+          html += `<button onclick="showSceneById(${action.next})">${action.text}</button>`;
+        });
+      }
+
+      html += '</div></div>';
+      container.innerHTML = html;
+    }
+
+    function nextMessage() {
+      messageIndex++;
+      renderScene();
+    }
+
+    function showSceneById(id) {
+      const nextIndex = scenes.findIndex(s => s.id === id);
+      if (nextIndex !== -1) {
+        showScene(nextIndex);
+      }
+    }
+
+    window.onload = () => {
+      showScene(0);
+    };
+  </script>
+</body>
+</html>
