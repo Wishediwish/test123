@@ -48,106 +48,96 @@
     button:hover {
       background: #666;
     }
-    .quiz {
-      margin-top: 1em;
-    }
-    .quiz p {
-      margin-bottom: 0.5em;
-    }
-    .quiz button {
-      width: auto;
-      margin-right: 0.5em;
-    }
-    input[type="text"] {
-      padding: 0.5em;
-      margin-top: 0.5em;
-      width: 90%;
-      border-radius: 6px;
-      border: none;
-    }
   </style>
 </head>
 <body>
   <div id="game-container"></div>
-  <script src="scenes.js"></script>
   <script>
-    const scenes = window.scenes;
-    let currentSceneIndex = 0;
+    const scenes = [
+      {
+        id: 1,
+        title: "Водопад Очищения",
+        background: "backgrounds/waterfall.jpg",
+        messages: [
+          "Итами просыпайся! Итамиии... ты в порядке?",
+          "Хух, я волновался что уже не получилось. Добро пожаловать. Нам с тобой предстоит пройти небольшое приключение и отыскать кое-что, оставленное тебе в этом месте.",
+          "Сейчас мы находимся у водопада очищения. Это место служит защитной стеной, здесь нет обходных путей. Путь только один — сквозь водопад. Он не пропускает всё, что не должно пройти.",
+          "Сложно поверить, но раньше его тут не было. Это была просто тропа. Нужно поторопиться, у нас не так много времени."
+        ],
+        actions: [
+          { text: "Ты слышишь чей-то голос, кто-то зовёт тебя — Проснуться.", nextStep: 1 },
+          { text: "Осмотреться вокруг.", nextStep: 2 },
+          { text: "... Проследовать за духом сквозь водопад.", nextScene: 2 }
+        ]
+      },
+      {
+        id: 2,
+        title: "Астрономическая Степь",
+        background: "backgrounds/starfield.jpg",
+        messages: [
+          "Место, где мысли и мечты отображаются в виде звёзд. Считается, что если коснуться звезды на воде, можно узнать, что она значит.",
+          "Видишь замок, к которому ведёт степь? Это место, куда мы с тобой направляемся. Хочешь попробовать устоять на воде и коснуться отражения звезды?"
+        ],
+        actions: [
+          { text: "Ступить на воду и попытаться коснуться звезды.", nextScene: 3 },
+          { text: "Следовать дальше по пути к Замку.", nextScene: 3 }
+        ]
+      }
+    ];
+
+    let currentScene = 0;
+    let messageIndex = 0;
 
     function showScene(index) {
-      const scene = scenes[index];
-      const container = document.getElementById('game-container');
-      document.body.style.backgroundImage = scene.background ? `url('${scene.background}')` : 'none';
+      currentScene = index;
+      messageIndex = 0;
+      renderScene();
+    }
 
+    function renderScene() {
+      const container = document.getElementById("game-container");
+      const scene = scenes[currentScene];
+      document.body.style.backgroundImage = `url('${scene.background}')`;
       let html = `<div class="screen active"><div class="container">`;
-      if (scene.title) {
-        html += `<h1>${scene.title}</h1>`;
+      html += `<h1>${scene.title}</h1>`;
+      for (let i = 0; i <= messageIndex; i++) {
+        if (scene.messages[i]) {
+          html += `<p>${scene.messages[i]}</p>`;
+        }
       }
-      scene.messages.forEach(msg => html += `<p>${msg}</p>`);
-
-      if (scene.actions) {
-        scene.actions.forEach(action => {
-          html += `<button onclick="showScene(${action.nextScene})">${action.text}</button>`;
-        });
-      }
-
-      if (scene.quiz) {
-        scene.quiz.forEach((question, qIndex) => {
-          html += `<div class="quiz"><p><strong>${question.question}</strong></p>`;
-          if (question.type === "input") {
-            html += `<input type="text" id="answer-${qIndex}" placeholder="Введи ответ...">`;
-            html += `<button onclick="checkInputAnswer(${index}, ${qIndex})">Проверить</button>`;
-          } else {
-            question.options.forEach((opt, oIndex) => {
-              html += `<button onclick="handleAnswer(${index}, ${qIndex}, ${oIndex})">${opt}</button>`;
-            });
-          }
-          html += `</div>`;
-        });
-      }
-
+      html += renderActions(scene);
       html += `</div></div>`;
       container.innerHTML = html;
     }
 
-    function handleAnswer(sceneIndex, questionIndex, optionIndex) {
-      const scene = scenes[sceneIndex];
-      const question = scene.quiz[questionIndex];
-      const correct = question.correct;
-
-      const container = document.getElementById('game-container');
-      let result = '';
-      if (Array.isArray(correct)) {
-        if (correct.includes(optionIndex)) {
-          result = '<p>Верно!</p>';
-        } else {
-          result = '<p>Неверно, попробуй снова.</p>';
+    function renderActions(scene) {
+      let output = "";
+      if (currentScene === 0) {
+        if (messageIndex === 0) {
+          output += `<button onclick="nextStep(1)">${scene.actions[0].text}</button>`;
+        } else if (messageIndex === 2) {
+          output += `<button onclick="nextStep(2)">${scene.actions[1].text}</button>`;
+        } else if (messageIndex === 3) {
+          output += `<button onclick="goToScene(1)">${scene.actions[2].text}</button>`;
         }
       } else {
-        if (optionIndex === correct) {
-          result = '<p>Верно!</p>';
-        } else {
-          result = '<p>Неверно, попробуй снова.</p>';
-        }
+        scene.actions.forEach(action => {
+          output += `<button onclick="goToScene(${action.nextScene})">${action.text}</button>`;
+        });
       }
-      result += `<button onclick="showScene(${sceneIndex + 1})">Продолжить</button>`;
-      container.innerHTML = `<div class="screen active"><div class="container">${result}</div></div>`;
+      return output;
     }
 
-    function checkInputAnswer(sceneIndex, questionIndex) {
-      const input = document.getElementById(`answer-${questionIndex}`);
-      const value = input.value.trim().toLowerCase();
-      const correctAnswers = window.scenes[sceneIndex].quiz[questionIndex].answers.map(a => a.toLowerCase());
-
-      const container = document.getElementById('game-container');
-      if (correctAnswers.includes(value)) {
-        container.innerHTML = `<div class="screen active"><div class="container"><p>Верно!</p><button onclick="showScene(${sceneIndex + 1})">Продолжить</button></div></div>`;
-      } else {
-        container.innerHTML = `<div class="screen active"><div class="container"><p>Неверно, попробуй снова.</p><button onclick="showScene(${sceneIndex})">Назад</button></div></div>`;
-      }
+    function nextStep(step) {
+      messageIndex = step + 1;
+      renderScene();
     }
 
-    window.onload = () => showScene(currentSceneIndex);
+    function goToScene(index) {
+      showScene(index);
+    }
+
+    window.onload = () => showScene(0);
   </script>
 </body>
 </html>
