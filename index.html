@@ -1,7 +1,8 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Сон или Реальность?</title>
   <style>
     body {
@@ -16,16 +17,12 @@
       transition: background-image 1s ease-in-out;
     }
     .screen {
-      display: none;
       padding: 2em;
       max-width: 700px;
       margin: auto;
     }
-    .active {
-      display: block;
-    }
     .container {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 12px;
       padding: 2em;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
@@ -51,97 +48,89 @@
   </style>
 </head>
 <body>
-  <div id="game-container"></div>
-  <script>
-    let scene = 1;
-    let step = 0;
-    let extraStar = false;
+  <div class="screen">
+    <div class="container">
+      <h1 id="scene-title"></h1>
+      <div id="scene-text"></div>
+      <div id="actions"></div>
+    </div>
+  </div>
 
-    function render() {
-      const container = document.getElementById('game-container');
-      let html = `<div class="screen active"><div class="container">`;
-      if (scene === 1) {
-        document.body.style.backgroundImage = `url('backgrounds/waterfall.jpg')`;
-        const scene1 = [
-          {
-            text: "Итами просыпайся! Итамиии... ты впорядке?",
-            action: { text: "Ты слышишь чей то голос, кто то зовет тебя - Проснуться.", next: 1 }
-          },
-          {
-            text: "Хух, я волновался что уже не получилось, Добро пожаловать, Нам с тобой предстоит пройти небольшое приключение, и отыскать кое что оставленое тебе в этом месте.",
-            action: { text: "Осмотреться вокруг.", next: 2 }
-          },
-          {
-            text: "Сейчас мы находимся у водопада очищения, это место служит защитной стеной, здесь нет обходных путей или горных проходов, путь только один через водопад, сквозь него проходит все, и не проходит так же Хех, Если что то посчитается не нужным или не допустимым, оно будет раздавленно непрерывным потоком. Сложно поверить но раньше его тут не было, и это была просто тропа. Ой! нужно поторопиться у нас не так много времени.",
-            action: { text: "... Проследовать за духом сквозь водопад.", next: "scene2" }
-          }
-        ];
-        html += `<h1>Сон или Реальность?</h1>`;
-        html += `<p>${scene1[step].text}</p>`;
-        html += `<button onclick="nextScene1(${JSON.stringify(scene1[step].action.next)})">${scene1[step].action.text}</button>`;
+  <script>
+    const scenes = [
+      {
+        title: "Водопад Очищения",
+        background: "backgrounds/waterfall.jpg",
+        messages: [
+          "Итами просыпайся! Итамиии... ты впорядке?",
+          "Хух, я волновался что уже не получилось, Добро пожаловать, Нам с тобой предстоит пройти небольшое приключение, и отыскать кое что оставленое тебе в этом месте.",
+          "Сейчас мы находимся у водопада очищения, это место служит защитной стеной, здесь нет обходных путей или горных проходов, путь только один через водопад, сквозь него проходит всё, и не проходит так же. Хех, если что-то посчитается не нужным или недопустимым — оно будет раздавлено непрерывным потоком. Сложно поверить, но раньше его тут не было, и это была просто тропа. Ой! нужно поторопиться, у нас не так много времени."
+        ],
+        actions: [
+          { text: "Ты слышишь чей-то голос, кто-то зовёт тебя — Проснуться.", nextMessage: 1 },
+          { text: "Осмотреться вокруг.", nextMessage: 2 },
+          { text: "... Проследовать за духом сквозь водопад.", nextScene: 1 }
+        ]
+      },
+      {
+        title: "Астрономическая Степь",
+        background: "backgrounds/starfield.jpg",
+        messages: [
+          "Место где мысли и мечты отображаются в виде звёзд, считается что если коснуться отображения звезды на воде, можно узнать что она значит. Но не каждый может устоять и не утонуть в звёздном озере. Видишь Замок, к которому ведёт степь? Это место, куда мы с тобой направляемся, в нём находится то, что привело тебя сюда. Хочешь попробовать устоять на воде и коснуться отражения звезды? Или пойдём дальше? Думаю, у нас хватит времени посмотреть одну из них.",
+          "Ступив аккуратно на поверхность воды, немного пошатнувшись, ты понимаешь, что вода тебя держит. После чего ты делаешь ещё один шаг, чтобы дотянуться до звезды. Коснувшись её, ты понимаешь, что это звезда отображает искреннее желание Вишеда прожить всю жизнь с человеком, которого зовут Итами. Звезда начинает светиться ещё сильнее и перемещается дальше по звёздному небу.",
+          "Дух: Удивительно, но кажется, это была твоя звезда. Итами, пойдём дальше, у нас не так много времени сейчас. Думаю, в будущем у тебя будет возможность вернуться и во всём тут разобраться."
+        ],
+        actions: [
+          { text: "Ступить на воду и попытаться коснуться звезды.", nextMessage: 1, unlock: 1 },
+          { text: "Следовать дальше по пути к Замку.", nextMessage: 2, unlock: 2 }
+        ]
       }
-      if (scene === 2) {
-        document.body.style.backgroundImage = `url('backgrounds/starfield.jpg')`;
-        if (step === 0) {
-          html += `<h1>Астрономическая Степь</h1>`;
-          html += `<p>Место где мысли и мечты отображатся ввиде звезд, считается что если коснуться отображение звезды на воде, можно узнать что она значит.<br>
-          Но не каждый может устоять и не утонуть в звездном озере.<br>
-          Видишь Замок к которому ведет степь? это место куда мы с тобой направляемся, в нем находится то что привело тебя сюда.<br>
-          Хочешь попробовать устоять на воде и коснуться отражения звезды? или пойдем дальше? Думаю у нас хватит времени посмотреть одну из них.</p>`;
-          html += `<button onclick="scene2choice('star')">Ступить на воду и попытаться коснуться звезды.</button>`;
-          html += `<button onclick="scene2choice('castle')">Следовать дальше по пути к Замку.</button>`;
-        } else if (step === 1 && extraStar) {
-          html += `<h1>Астрономическая Степь</h1>`;
-          html += `<p>Ступив аккуратно на поверхность воды, немного пошатнувшись ты понимаешь что вода тебя держит, после чего ты делаешь еще один шаг, чтобы дотянутся до звезды.<br>
-          Коснувшись ее, ты понимаешь что это звезда отображает Искреннее желание вишеда прожить всю жизнь с человеком которого зовут Итами.<br>
-          Звезда начинает светится еще сильнее, и перемещается дальше по звездному небу.</p>`;
-          html += `<button onclick="scene2continue()">Продолжить путь к замку.</button>`;
-        } else if ((step === 2 && extraStar) || (step === 1 && !extraStar)) {
-          html += `<h1>Астрономическая Степь</h1>`;
-          html += `<p>Дух: Удивительно, но кажется это была твоя звезда. Итами пойдем дальше, у нас не так много времени сейчас, думаю в будущем у тебя будет возможность вернутся и во всем тут разобраться)</p>`;
-          html += `<button onclick="scene=3; step=0; render()">Перейти в Зал Испытаний</button>`;
+    ];
+
+    let currentScene = 0;
+    let currentMessage = 0;
+    const seenMessages = new Set();
+
+    function renderScene() {
+      const scene = scenes[currentScene];
+      document.body.style.backgroundImage = `url('${scene.background}')`;
+      document.getElementById("scene-title").textContent = scene.title;
+
+      const textContainer = document.getElementById("scene-text");
+      textContainer.innerHTML = "";
+      for (let i = 0; i <= currentMessage; i++) {
+        if (scene.messages[i]) {
+          const p = document.createElement("p");
+          p.textContent = scene.messages[i];
+          textContainer.appendChild(p);
         }
       }
-      if (scene === 3) {
-        document.body.style.backgroundImage = `none`;
-        html += `<h1>Зал Испытаний</h1><p>(Заглушка для перехода, чтобы убедиться что всё работает. Дальше добавим сцену 3.)</p>`;
-      }
-      html += `</div></div>`;
-      container.innerHTML = html;
+
+      const actionsContainer = document.getElementById("actions");
+      actionsContainer.innerHTML = "";
+      scene.actions.forEach((action, idx) => {
+        if (action.nextMessage !== undefined && action.nextMessage > currentMessage) return;
+        if (action.unlock !== undefined && !seenMessages.has(action.unlock)) return;
+
+        const btn = document.createElement("button");
+        btn.textContent = action.text;
+        btn.onclick = () => {
+          if (action.nextMessage !== undefined) {
+            currentMessage = action.nextMessage;
+            seenMessages.add(currentMessage);
+            renderScene();
+          } else if (action.nextScene !== undefined) {
+            currentScene = action.nextScene;
+            currentMessage = 0;
+            seenMessages.clear();
+            renderScene();
+          }
+        };
+        actionsContainer.appendChild(btn);
+      });
     }
 
-    function nextScene1(next) {
-      if (typeof next === "number") {
-        step = next;
-        render();
-      } else if (next === "scene2") {
-        scene = 2;
-        step = 0;
-        render();
-      }
-    }
-
-    function scene2choice(choice) {
-      if (choice === 'star') {
-        step = 1;
-        extraStar = true;
-        render();
-      }
-      if (choice === 'castle') {
-        step = 1;
-        extraStar = false;
-        render();
-      }
-    }
-
-    function scene2continue() {
-      step = 2;
-      render();
-    }
-
-    window.onload = () => {
-      render();
-    };
+    window.onload = () => renderScene();
   </script>
 </body>
 </html>
