@@ -36,8 +36,8 @@
     }
     button {
       margin: 1em 0;
-      background: #333;
-      border: 1px solid #999;
+      background: #444;
+      border: none;
       padding: 1em;
       color: white;
       border-radius: 8px;
@@ -46,7 +46,7 @@
       transition: 0.3s;
     }
     button:hover {
-      background: #555;
+      background: #666;
     }
     .quiz {
       margin-top: 1em;
@@ -58,94 +58,36 @@
       width: auto;
       margin-right: 0.5em;
     }
-    .gap-fill {
-      background: #222;
-      border: 1px solid #555;
-      padding: 0.5em;
-      margin-bottom: 1em;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
   <div id="game-container"></div>
   <script src="scenes.js"></script>
   <script>
+    const scenes = window.scenes;
     let currentSceneIndex = 0;
 
     function showScene(index) {
-      const scene = window.scenes[index];
+      const scene = scenes[index];
       const container = document.getElementById('game-container');
       document.body.style.backgroundImage = scene.background ? `url('${scene.background}')` : 'none';
 
       let html = `<div class="screen active"><div class="container">`;
-
-      if (scene.title) html += `<h1>${scene.title}</h1>`;
+      if (scene.title) {
+        html += `<h1>${scene.title}</h1>`;
+      }
       if (scene.messages) {
-        scene.messages.forEach(message => {
-          html += `<p>${message}</p>`;
+        scene.messages.forEach((msg) => {
+          html += `<p>${msg}</p>`;
         });
       }
-
-      if (scene.quiz) {
-        scene.quiz.forEach((question, qIndex) => {
-          if (question.type === 'gap-fill') {
-            html += `<div class="quiz"><p><strong>Вопрос ${qIndex + 1}:</strong> ${question.q}</p>`;
-            html += `<input type="text" id="gap${qIndex}" class="gap-fill" placeholder="Ваш ответ...">`;
-            html += `<button onclick="checkGapFillAnswer(${index}, ${qIndex})">Ответить</button></div>`;
-          } else {
-            html += `<div class="quiz"><p><strong>Вопрос ${qIndex + 1}:</strong> ${question.q}</p>`;
-            question.options.forEach((opt, oIndex) => {
-              html += `<button onclick="handleAnswer(${index}, ${qIndex}, ${oIndex})">${opt}</button>`;
-            });
-            html += `</div>`;
-          }
-        });
-      }
-
       if (scene.actions) {
-        scene.actions.forEach(action => {
+        scene.actions.forEach((action, i) => {
           html += `<button onclick="showScene(${action.nextScene})">${action.text}</button>`;
         });
       }
-
       html += `</div></div>`;
       container.innerHTML = html;
-    }
-
-    function handleAnswer(sceneIndex, questionIndex, optionIndex) {
-      const scene = window.scenes[sceneIndex];
-      const question = scene.quiz[questionIndex];
-      const correct = question.correct;
-      const container = document.getElementById('game-container');
-      let result = '';
-
-      if (Array.isArray(correct)) {
-        result = correct[optionIndex] ? '<p>Верно!</p>' : '<p>Неверно, попробуй снова.</p>';
-      } else {
-        result = optionIndex === correct ? '<p>Верно!</p>' : '<p>Неверно, попробуй снова.</p>';
-      }
-
-      result += `<button onclick="showScene(${sceneIndex + 1})">Продолжить</button>`;
-      container.innerHTML = `<div class="screen active"><div class="container">${result}</div></div>`;
-    }
-
-    function checkGapFillAnswer(sceneIndex, questionIndex) {
-      const input = document.getElementById(`gap${questionIndex}`);
-      const userAnswer = input.value.trim().toLowerCase();
-      const scene = window.scenes[sceneIndex];
-      const question = scene.quiz[questionIndex];
-      const correctAnswer = question.correct.toLowerCase();
-      const container = document.getElementById('game-container');
-      let result = '';
-
-      if (userAnswer === correctAnswer) {
-        result = `<p>Верно!</p><button onclick="showScene(${sceneIndex + 1})">Продолжить</button>`;
-      } else {
-        result = `<p>Неверно, попробуй снова.</p><button onclick="showScene(${sceneIndex})">Попробовать ещё раз</button>`;
-      }
-
-      container.innerHTML = `<div class="screen active"><div class="container">${result}</div></div>`;
     }
 
     window.onload = () => showScene(currentSceneIndex);
