@@ -78,7 +78,7 @@
         ];
         html += `<h1>Сон или Реальность?</h1>`;
         html += `<p>${scene1[step].text}</p>`;
-        html += `<button onclick="nextScene1(${scene1[step].action.next})">${scene1[step].action.text}</button>`;
+        html += `<button onclick="nextScene1(${JSON.stringify(scene1[step].action.next)})">${scene1[step].action.text}</button>`;
       }
       if (scene === 2) {
         document.body.style.backgroundImage = `url('backgrounds/starfield.jpg')`;
@@ -92,3 +92,56 @@
           html += `<button onclick="scene2choice('castle')">Следовать дальше по пути к Замку.</button>`;
         } else if (step === 1 && extraStar) {
           html += `<h1>Астрономическая Степь</h1>`;
+          html += `<p>Ступив аккуратно на поверхность воды, немного пошатнувшись ты понимаешь что вода тебя держит, после чего ты делаешь еще один шаг, чтобы дотянутся до звезды.<br>
+          Коснувшись ее, ты понимаешь что это звезда отображает Искреннее желание вишеда прожить всю жизнь с человеком которого зовут Итами.<br>
+          Звезда начинает светится еще сильнее, и перемещается дальше по звездному небу.</p>`;
+          html += `<button onclick="scene2continue()">Продолжить путь к замку.</button>`;
+        } else if ((step === 2 && extraStar) || (step === 1 && !extraStar)) {
+          html += `<h1>Астрономическая Степь</h1>`;
+          html += `<p>Дух: Удивительно, но кажется это была твоя звезда. Итами пойдем дальше, у нас не так много времени сейчас, думаю в будущем у тебя будет возможность вернутся и во всем тут разобраться)</p>`;
+          html += `<button onclick="scene=3; step=0; render()">Перейти в Зал Испытаний</button>`;
+        }
+      }
+      if (scene === 3) {
+        document.body.style.backgroundImage = `none`;
+        html += `<h1>Зал Испытаний</h1><p>(Заглушка для перехода, чтобы убедиться что всё работает. Дальше добавим сцену 3.)</p>`;
+      }
+      html += `</div></div>`;
+      container.innerHTML = html;
+    }
+
+    function nextScene1(next) {
+      if (typeof next === "number") {
+        step = next;
+        render();
+      } else if (next === "scene2") {
+        scene = 2;
+        step = 0;
+        render();
+      }
+    }
+
+    function scene2choice(choice) {
+      if (choice === 'star') {
+        step = 1;
+        extraStar = true;
+        render();
+      }
+      if (choice === 'castle') {
+        step = 1;
+        extraStar = false;
+        render();
+      }
+    }
+
+    function scene2continue() {
+      step = 2;
+      render();
+    }
+
+    window.onload = () => {
+      render();
+    };
+  </script>
+</body>
+</html>
