@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Путь Итами</title>
   <style>
     body {
@@ -75,9 +75,17 @@
       if (scene.title) {
         html += `<h1>${scene.title}</h1>`;
       }
-      if (scene.messages) {
-        scene.messages.forEach(message => {
-          html += `<p>${message}</p>`;
+      scene.messages.forEach(message => {
+        html += `<p>${message}</p>`;
+      });
+
+      if (scene.quiz) {
+        scene.quiz.forEach((question, qIndex) => {
+          html += `<div class="quiz"><p><strong>Вопрос ${qIndex + 1}:</strong> ${question.question}</p>`;
+          question.options.forEach((opt, oIndex) => {
+            html += `<button onclick="handleAnswer(${index}, ${qIndex}, ${oIndex})">${opt}</button>`;
+          });
+          html += `</div>`;
         });
       }
 
@@ -87,28 +95,19 @@
         });
       }
 
-      if (scene.quiz) {
-        scene.quiz.forEach((question, qIndex) => {
-          html += `<div class="quiz"><p><strong>Вопрос ${qIndex + 1}:</strong> ${question.q}</p>`;
-          question.options.forEach((opt, oIndex) => {
-            html += `<button onclick="handleAnswer(${index}, ${qIndex}, ${oIndex})">${opt}</button>`;
-          });
-          html += `</div>`;
-        });
-      }
-
       html += `</div></div>`;
       container.innerHTML = html;
     }
 
     function handleAnswer(sceneIndex, questionIndex, optionIndex) {
-      const question = scenes[sceneIndex].quiz[questionIndex];
+      const scene = scenes[sceneIndex];
+      const question = scene.quiz[questionIndex];
       const correct = question.correct;
+
       const container = document.getElementById('game-container');
       let result = '';
-
       if (Array.isArray(correct)) {
-        if (correct.includes(optionIndex)) {
+        if (correct[optionIndex]) {
           result = '<p>Верно!</p>';
         } else {
           result = '<p>Неверно, попробуй снова.</p>';
